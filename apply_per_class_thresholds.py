@@ -18,23 +18,23 @@ def main():
     preds_df = pd.read_csv(args.preds)
     gt_df = pd.read_csv(args.gt)
 
-    # 对齐顺序（按文件名 merge）
+    
     left_key = "image_path" if "image_path" in preds_df.columns else args.image_col
     preds_df[left_key] = preds_df[left_key].astype(str)
     gt_df[args.image_col] = gt_df[args.image_col].astype(str)
     df = preds_df.merge(gt_df, left_on=left_key, right_on=args.image_col, how="inner", suffixes=("", "_gt"))
 
-    # 找出类别列表（从 prob_* 推断）
+    
     classes = [c.replace("prob_", "") for c in df.columns if c.startswith("prob_")]
 
-    # 用每类阈值重算 pred_ 列
+    
     for cls in classes:
         pcol = f"prob_{cls}"
         outcol = f"pred_{cls}"
         t = thr.get(cls, 0.5)
         df[outcol] = (df[pcol].values >= t).astype(int)
 
-    # 评估：F1_micro（用新的 pred_ 列） + mAP_macro（阈值无关，直接用概率）
+    
     y_true = df[classes].values.astype(int)
     prob_cols = [f"prob_{c}" for c in classes]
     y_prob = df[prob_cols].values
@@ -44,7 +44,7 @@ def main():
 
     f1_micro = f1_score(y_true, y_pred, average="micro", zero_division=0)
 
-    # mAP（macro）
+    
     ap_per_class = []
     for i in range(len(classes)):
         if y_true[:, i].sum() == 0:

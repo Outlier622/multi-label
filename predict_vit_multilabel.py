@@ -13,7 +13,7 @@ def load_model(ckpt_path, device):
     if "model" in checkpoint:
         model = checkpoint["model"]
     else:
-        # 从 args 中恢复模型结构
+        
         from torchvision.models import vit_b_16, ViT_B_16_Weights
         weights = None
         num_classes = checkpoint.get("num_classes", len(checkpoint.get("class_names", [])))
@@ -49,27 +49,27 @@ def main():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # 读取类别
+    
     with open(args.classes_json, "r", encoding="utf-8") as f:
         class_names = json.load(f)
 
-    # 读取 per-class 阈值
+    
     per_class_thr = None
     if args.per_class_thresholds:
         df_thr = pd.read_csv(args.per_class_thresholds)
         per_class_thr = {row["Class"]: row["Best_Threshold"] for _, row in df_thr.iterrows()}
 
-    # 加载模型
+    
     model = load_model(args.ckpt, device)
 
-    # 预处理
+    
     transform = transforms.Compose([
         transforms.Resize((384, 384)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5]*3, std=[0.5]*3)
     ])
 
-    # 读取图片路径
+    
     if args.input_dir:
         image_paths = [os.path.join(args.input_dir, f) for f in os.listdir(args.input_dir)
                        if f.lower().endswith((".jpg", ".jpeg", ".png"))]

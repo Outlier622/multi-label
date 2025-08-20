@@ -120,4 +120,4 @@ async def predict(files: List[UploadFile] = File(...), topk: int = Form(5)):
         ))
     return out
 
-# 启动： uvicorn server:app --host 0.0.0.0 --port 8000 --workers 1
+# start： uvicorn server:app --host 0.0.0.0 --port 8000 --workers 1
