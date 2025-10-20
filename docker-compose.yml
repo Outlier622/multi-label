@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clip-faiss-api
+    ports:
+      - "8000:8000"
+    environment:
+      # ===== App / Model =====
+      PORT: "8000"
+      MODEL_ID: "openai/clip-vit-base-patch32"   
+      DEVICE: "cpu"                              
+      BATCH_SIZE: "16"
+      TOP_K: "10"
+
+      # ===== FAISS / Paths =====
+      INDEX_PATH: "/workspace/artifacts/index/faiss.index"
+      EMBED_CACHE_DIR: "/workspace/artifacts/emb_cache"
+      DATA_DIR: "/workspace/data"                
+      CLASS_LIST: "/workspace/data/classes.txt"  
+
+      # ===== Performance / Caching =====
+      ENABLE_BATCHING: "true"
+      ENABLE_INMEM_CACHE: "true"
+
+      # ===== Metrics / Health =====
+      METRICS_ENABLED: "true"
+
+    volumes:
+      - ./data:/workspace/data
+      - ./artifacts:/workspace/artifacts
+    restart: unless-stopped
+
